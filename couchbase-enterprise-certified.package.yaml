@@ -1,5 +1,5 @@
 channels:
-- currentCSV: couchbase-operator.v1.2.2
+- currentCSV: couchbase-operator.v2.0.0
   name: stable
 defaultChannel: stable
 packageName: couchbase-enterprise-certified
