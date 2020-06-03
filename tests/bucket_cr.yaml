@@ -1,0 +1,17 @@
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseBucket
+metadata:
+  name: default
+  labels:
+    cluster: cb-example
+spec:
+  memoryQuota: 100Mi
+  replicas: 2
+  ioPriority: low
+  evictionPolicy: valueOnly
+  conflictResolution: lww
+  enableFlush: false
+  enableIndexReplica: true
+  compressionMode: passive
+status: {}

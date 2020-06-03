@@ -1,0 +1,12 @@
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseUser
+metadata:
+  name: my-user
+  labels:
+    cluster: cb-example
+spec:
+  fullName: My User
+  authDomain: local
+  authSecret: cb-example-auth
+status: {}

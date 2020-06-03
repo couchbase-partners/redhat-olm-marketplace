@@ -1,0 +1,33 @@
+scorecard:
+  output: json
+  bundle: deploy/olm-catalog/
+  plugins:
+    - olm:
+        olm-deployed: false 
+        csv-path: "2.0.0/couchbase-v2.0.0.clusterserviceversion.yaml"
+        cr-manifest:
+          - "tests/cluster_cr.yaml"
+#   - olm:
+#       csv-path: "2.0.0/couchbase-v2.0.0.clusterserviceversion.yaml"
+#       cr-manifest:
+#         - "tests/user_cr.yaml"
+#   - olm:
+#       olm-deployed: false 
+#       csv-path: "2.0.0/couchbase-v2.0.0.clusterserviceversion.yaml"
+#       cr-manifest:
+#         - "tests/group_cr.yaml"
+#   - olm:
+#       olm-deployed: false 
+#       csv-path: "2.0.0/couchbase-v2.0.0.clusterserviceversion.yaml"
+#       cr-manifest:
+#         - "tests/binding_cr.yaml"
+#   - olm:
+#       olm-deployed: false 
+#       csv-path: "2.0.0/couchbase-v2.0.0.clusterserviceversion.yaml"
+#       cr-manifest:
+#         - "tests/bucket_cr.yaml"
+#   - olm:
+#       olm-deployed: false 
+#       csv-path: "2.0.0/couchbase-v2.0.0.clusterserviceversion.yaml"
+#       cr-manifest:
+#         - "tests/backup_cr.yaml"

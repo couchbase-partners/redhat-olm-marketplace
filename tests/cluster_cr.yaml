@@ -1,0 +1,32 @@
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseCluster
+metadata:
+  name: cb-example
+spec:
+  image: registry.connect.redhat.com/couchbase/operator-backup:6.5.0-3
+  security:
+    adminSecret: cb-example-auth
+    rbac:
+      managed: true
+  networking:
+    exposeAdminConsole: true
+    adminConsoleServices:
+      - data
+    exposedFeatures:
+      - xdcr
+    exposedFeatureServiceType: NodePort
+    adminConsoleServiceType: NodePort
+  buckets:
+    managed: true
+  servers:
+    - size: 1
+      name: all_services
+      services:
+        - data
+        - index
+        - query
+        - search
+        - eventing
+        - analytics
+status: {}

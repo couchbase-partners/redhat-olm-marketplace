@@ -1,0 +1,12 @@
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseGroup
+metadata:
+  name: my-group
+  labels:
+    cluster: cb-example
+spec:
+  roles:
+  - name: bucket_admin
+    bucket: default
+status: {}

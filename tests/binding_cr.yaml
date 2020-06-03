@@ -1,0 +1,13 @@
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseRoleBinding
+metadata:
+  name: my-role-binding
+spec:
+  subjects:
+  - kind: CouchbaseUser
+    name: my-user
+  roleRef:
+    kind: CouchbaseGroup
+    name: my-group
+status: {}

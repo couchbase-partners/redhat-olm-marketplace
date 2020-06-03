@@ -11,7 +11,7 @@ metadata:
             "name": "cb-example"
           },
           "spec": {
-            "image": "registry.connect.redhat.com/couchbase/server:6.5.1-1",
+            "image": "registry.connect.redhat.com/couchbase/server:6.5.0-3",
             "cluster": {
               "dataServiceMemoryQuota": "256Mi",
               "indexServiceMemoryQuota": "256Mi",
@@ -62,7 +62,7 @@ metadata:
                 }
              },
             "backup": {
-              "image": "registry.connect.redhat.com/couchbase/operator-backup:6.5.1-1",
+              "image": "registry.connect.redhat.com/couchbase/operator-backup:6.5.0-3",
               "managed": false,
               "serviceAccountName": "couchbase-backup",
               "selector": {
@@ -115,7 +115,8 @@ metadata:
                 ]
               }
             ]
-          }
+          },
+          "status": {}
         },
         {
           "apiVersion": "couchbase.com/v2",
@@ -135,7 +136,8 @@ metadata:
             "enableFlush": false,
             "enableIndexReplica": true,
             "compressionMode": "passive"
-          }
+          },
+          "status": {}
         },
         {
           "apiVersion": "couchbase.com/v2",
@@ -160,7 +162,8 @@ metadata:
             "backupRetention": "24h",
             "logRetention": "24h",
             "size": "5Gi"
-          }
+          },
+          "status": {}
         },
         {
           "apiVersion": "couchbase.com/v2",
@@ -172,10 +175,11 @@ metadata:
             }
           },
           "spec": {
-            "fullName": "Jane Doe",
+            "fullName": "My User",
             "authDomain": "local",
             "authSecret": "cb-example-auth"
-          }
+          },
+          "status": {}
         },
         {
           "apiVersion": "couchbase.com/v2",
@@ -193,7 +197,8 @@ metadata:
                 "bucket": "default"
               }
             ]
-          }
+          },
+          "status": {}
         },
         {
           "apiVersion": "couchbase.com/v2",
@@ -212,10 +217,11 @@ metadata:
               "kind": "CouchbaseGroup",
               "name": "my-group"
             }
-          }
+          },
+          "status": {}
         }
       ]
-    capabilities: Deep Insights
+    capabilities: "Auto Pilot"
     categories: "Database"
     certified: "true"
     containerImage: registry.connect.redhat.com/couchbase/operator:2.0.0-1
@@ -232,11 +238,13 @@ spec:
       kind: CouchbaseCluster
       name: couchbaseclusters.couchbase.com
       resources:
+      - kind: CouchbaseCluster
+        version: v2
+      - kind: ConfigMap
+        version: v1
       - kind: Service
-        name: ""
         version: v1
       - kind: Pod
-        name: ""
         version: v1
       specDescriptors:
       - description: The name of the secret object that stores the admin credentials.
@@ -244,6 +252,14 @@ spec:
         path: secret.adminSecret
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
+      - description:  This field specifies the image that should be used.
+        displayName: Image
+        path: image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:string
+      - description: Specifies whether to manage buckets and how to select which bucket resources to use.
+        displayName: Buckets
+        path: buckets
       - description: Specifies whether the Operator should manage Couchbase buckets.
         displayName: Buckets managed
         path: buckets.managed
@@ -294,6 +310,15 @@ spec:
         path: monitoring.prometheus.selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:selector:core:v1:ConfigMap
+      - description: This object allows configuration of global Couchbase security settings and RBAC.
+        displayName: Security
+        path: security
+      - description: This object allows the configuration of the Couchbase cluster topology.
+        displayName: Servers
+        path: servers
+      - description: This object allows configuration of network related options.
+        displayName: Networking
+        path: networking
       - description: The name of the secret object that stores the server's TLS
           certificate.
         displayName: Server TLS Secret
@@ -395,6 +420,18 @@ spec:
       description: Manages Buckets
       displayName: Couchbase Bucket
       version: v2
+      resources:
+      - kind: CouchbaseBucket
+        version: v2
+      - kind: CouchbaseCluster
+        version: v2
+      - kind: ConfigMap
+        version: v1
+      - kind: Service
+        version: v1
+      - kind: Pod
+        version: v1
+
       specDescriptors:
       - description: The name of a couchbase bucket.
         displayName: Bucket Name
@@ -431,12 +468,33 @@ spec:
         path: compressionMode
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:string
+      - description: This field specifies whether or not to enable view index replicas for this bucket.
+        displayName: Enable Index Replica
+        path: enableIndexReplica
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
     - kind: CouchbaseUser
       name: couchbaseusers.couchbase.com
       description: Manages RBAC Users
       displayName: Couchbase User
       version: v2
+      resources:
+      - kind: CouchbaseUser
+        version: v2
+      - kind: CouchbaseCluster
+        version: v2
+      - kind: ConfigMap
+        version: v1
+      - kind: Service
+        version: v1
+      - kind: Pod
+        version: v1
       specDescriptors:
+      - description: The user full name.
+        displayName: Full Name
+        path: fullName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:string
       - description: The domain used to authenticate user (local | ldap)
         displayName: Auth Domain
         path: authDomain
@@ -452,11 +510,44 @@ spec:
       description: Manages RBAC Groups
       displayName: Couchbase Groups
       version: v2
+      resources:
+      - kind: CouchbaseGroup
+        version: v2
+      - kind: CouchbaseCluster
+        version: v2
+      - kind: ConfigMap
+        version: v1
+      - kind: Service
+        version: v1
+      - kind: Pod
+        version: v1
+      specDescriptors:
+      - description: This field is a list of roles to be associated with a user or group of users.
+        displayName: Roles
+        path: roles
     - kind: CouchbaseRoleBinding
       name: couchbaserolebindings.couchbase.com
       description: Manages RBAC Binding
       displayName: Couchbase Role Binding
       version: v2
+      resources:
+      - kind: CouchbaseRoleBinding
+        version: v2
+      - kind: CouchbaseCluster
+        version: v2
+      - kind: ConfigMap
+        version: v1
+      - kind: Service
+        version: v1
+      - kind: Pod
+        version: v1
+      specDescriptors:
+      - description: This field defines the resource to extract the roles from.
+        displayName: Role Reference
+        path: roleRef
+      - description: This field is a list of subjects to a apply role to.
+        displayName: Subjects
+        path: subjects
     - kind: CouchbaseBackup
       name: couchbasebackups.couchbase.com
       description: Manages Backups
@@ -465,6 +556,16 @@ spec:
       - kind: CronJob
         name: ""
         version: batch/v1beta1
+      - kind: CouchbaseRoleBinding
+        version: v2
+      - kind: CouchbaseCluster
+        version: v2
+      - kind: ConfigMap
+        version: v1
+      - kind: Service
+        version: v1
+      - kind: Pod
+        version: v1
       version: v2
       specDescriptors:
       - description: The backup strategy to use (full_only | full_incremental)
@@ -492,17 +593,36 @@ spec:
         path: size
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-  relatedImages:
-  - name: default
-    image: registry.connect.redhat.com/couchbase/server@sha256:fd6d9c0ef033009e76d60dc36f55ce7f3aaa942a7be9c2b66c335eabc8f5b11e
-  - name: couchbase-6.0.4
-    image: registry.connect.redhat.com/couchbase/server@sha256:e83852666816dd0a0d86180a0867aa25458c21702f28e5903bb012e079ebe055
-  - name: couchbase-6.5.1
-    image: registry.connect.redhat.com/couchbase/server@sha256:fd6d9c0ef033009e76d60dc36f55ce7f3aaa942a7be9c2b66c335eabc8f5b11e
-  - name: backup-6.5.0
-    image: registry.connect.redhat.com/couchbase/operator-backup@sha256:bb1d3cd2a3d084bd0e795e6cd1b6bf0d8f4197ef0333d7e1ba05f3f58f27557b
-  - name: metrics-1.0.0
-    image: registry.connect.redhat.com/couchbase/exporter@sha256:18015c72d17a33a21ea221d48fddf493848fc1ca5702007f289369c5815fb3df
+      - description: The field defines the schedule to use for full backup.
+        displayName: Full
+        path: full
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:string
+      - description: This field defines the schedule a user wants the Operator to perform an incremental backup of the cluster.
+        displayName: Incremental
+        path: incremental
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:string
+      - description: This field defines the amount of times one backup job will try to perform a backup.
+        displayName: Back Off Limit
+        path: backOffLimit
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: This field defines the time period in which to retain existing backups.
+        displayName: Backup Retention
+        path: backupRetention
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:string
+      - description: This field defines the time period in which to retain backup logs.
+        displayName: Log Retention Time
+        path: logRetention
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:string
+      - description: This field defines the amount of failed jobs to keep before Kubernetes starts deleting older ones.
+        displayName: Failed Jobs History Limit
+        path: failedJobsHistoryLimit
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
   description: |
     The Couchbase Autonomous Operator allows users to easily deploy, manage, and maintain Couchbase deployments on OpenShift. By installing this integration you will be able to deply Couchbase Server clusters with a single command.
 
@@ -563,17 +683,11 @@ spec:
                     fieldRef:
                       fieldPath: metadata.name
                 - name: RELATED_IMAGE_COUCHBASE_SERVER
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.annotations['olm.relatedImage.couchbase-6.5.1']
+                  value: registry.connect.redhat.com/couchbase/server@sha256:b21765563ba510c0b1ca43bc9287567761d901b8d00fee704031e8f405bfa501
                 - name: RELATED_IMAGE_COUCHBASE_BACKUP
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.annotations['olm.relatedImage.backup-6.5.0']
+                  value: registry.connect.redhat.com/couchbase/operator-backup@sha256:218080954d616b78405a42e0df7561b7cd1bae09c4b2addc9cc56244d1eab0e0
                 - name: RELATED_IMAGE_COUCHBASE_METRICS
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.annotations['olm.relatedImage.metrics-1.0.0']
+                  value: registry.connect.redhat.com/couchbase/exporter@sha256:b5a052fab4c635ab2d880a6ac771c66f554b9a4b5b1b53a73ba8ef1b573be372
                 image: registry.connect.redhat.com/couchbase/operator:2.0.0-1
                 name: couchbase-operator
                 ports:
