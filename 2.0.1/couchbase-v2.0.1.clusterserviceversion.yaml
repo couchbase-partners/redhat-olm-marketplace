@@ -13,6 +13,7 @@ metadata:
           "spec": {
             "image": "registry.connect.redhat.com/couchbase/server:6.5.0-3",
             "cluster": {
+              "clusterName": "cb-example",
               "dataServiceMemoryQuota": "256Mi",
               "indexServiceMemoryQuota": "256Mi",
               "searchServiceMemoryQuota": "256Mi",
@@ -98,9 +99,6 @@ metadata:
             },
             "logRetentionTime": "604800s",
             "logRetentionCount": 20,
-            "securityContext": {
-              "fsGroup": 1000150000
-            },
             "servers": [
               {
                 "size": 3,
@@ -247,11 +245,29 @@ spec:
       - kind: Pod
         version: v1
       specDescriptors:
+      - description: Cluster name override
+        displayName: Cluster name
+        path: cluster.clusterName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:string
+      - description: This object allows configuration of global Couchbase security settings and RBAC.
+        displayName: Security
+        path: security
       - description: The name of the secret object that stores the admin credentials.
         displayName: Admin Secret
-        path: secret.adminSecret
+        path: security.adminSecret
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Specifies whether the Operator should manage Couchbase RBAC.
+        displayName: RBAC managed
+        path: security.rbac.managed
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Specifies the labels of RBAC resources to be selected and managed.
+        displayName: RBAC selector
+        path: security.rbac.selector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:selector:core:v1:ConfigMap
       - description:  This field specifies the image that should be used.
         displayName: Image
         path: image
@@ -268,16 +284,6 @@ spec:
       - description: Specifies the labels of buckets to be selected and managed.
         displayName: Buckets selector
         path: buckets.selector
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:selector:core:v1:ConfigMap
-      - description: Specifies whether the Operator should manage Couchbase RBAC.
-        displayName: RBAC managed
-        path: security.rbac.managed
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-      - description: Specifies the labels of RBAC resources to be selected and managed.
-        displayName: RBAC selector
-        path: security.rbac.selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:selector:core:v1:ConfigMap
       - description: Specifies whether the Operator should manage Couchbase XDCR replications.
@@ -302,7 +308,7 @@ spec:
         - urn:alm:descriptor:com.tectonic.ui:selector:core:v1:ConfigMap
       - description: Defines whether the Prometheus metric collection is enabled for the cluster.
         displayName: Monitoring enabled
-        path: monitoring.prometheus.managed
+        path: monitoring.prometheus.enabled
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - description: Specifies the labels of Backup resources to be selected and managed.
@@ -310,9 +316,7 @@ spec:
         path: monitoring.prometheus.selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:selector:core:v1:ConfigMap
-      - description: This object allows configuration of global Couchbase security settings and RBAC.
-        displayName: Security
-        path: security
+
       - description: This object allows the configuration of the Couchbase cluster topology.
         displayName: Servers
         path: servers
@@ -322,7 +326,7 @@ spec:
       - description: The name of the secret object that stores the server's TLS
           certificate.
         displayName: Server TLS Secret
-        path: networking.tls.static.member.serverSecret
+        path: networking.tls.static.serverSecret
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
       - description: The name of the secret object that stores the Operator's TLS
@@ -364,6 +368,12 @@ spec:
         path: servers[0].size
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:podCount
+      - description: The services that should be run on nodes (data, index, query, search, eventing and analytics)
+        displayName: Services
+        path: servers[0].services
+      - description: The set of server groups to schedule pods in (overrides top-level serverGroups)
+        displayName: ServerGroups
+        path: servers[0].serverGroups
       - description: The maximum number of failover events tolerated before manual
           intervention is required.
         displayName: Auto Failover Max Count
@@ -371,6 +381,25 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:slider
         - urn:alm:descriptor:com.tectonic.ui:sliderStart:1
+      - description: LDAP settings for external user authentication
+        displayName: LDAP Settings
+        path: security.ldap
+      - description: List of LDAP hosts Operator should connect to for authentication
+        displayName: Hosts
+        path: security.ldap.hosts
+      - description: The port Operator should use connect when connecting to hosts
+        displayName: Port
+        path: security.ldap.port
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description:  The type of encryption to use for connection with the LDAP server (None, TLS, StartTLSExtension)
+        displayName: Encryption
+        path: security.ldap.encryption
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:string
+      - description: The set of server groups to schedule pods in.
+        displayName: ServerGroups
+        path: serverGroups
       statusDescriptors:
       - description: The desired number of member Pods for the deployment.
         displayName: Size
