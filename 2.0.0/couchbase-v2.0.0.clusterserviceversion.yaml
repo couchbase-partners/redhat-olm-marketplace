@@ -453,7 +453,7 @@ spec:
         path: evictionPolicy
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:string
-      - description: The bucket’s conflict resolution mechanism (seqno | lww)
+      - description: The bucket's conflict resolution mechanism (seqno | lww)
         displayName: Conflict Resolution
         path: conflictResolution
         x-descriptors:

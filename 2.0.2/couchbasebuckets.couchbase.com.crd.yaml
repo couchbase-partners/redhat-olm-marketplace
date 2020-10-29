@@ -77,9 +77,9 @@ spec:
           type: object
       type: object
   versions:
-  - name: v1
-    served: false
-    storage: false
   - name: v2
     served: true
     storage: true
+  - name: v1
+    served: false
+    storage: false
