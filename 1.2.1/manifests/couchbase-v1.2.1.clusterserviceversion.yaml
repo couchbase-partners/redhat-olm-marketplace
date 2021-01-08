@@ -358,7 +358,9 @@ spec:
   minKubeVersion: 1.12.0
   provider:
     name: Couchbase
-  replaces: couchbase-operator.v1.1.0
+  skips:
+   - couchbase-operator.v1.0.0
+   - couchbase-operator.v1.1.0
   selector:
     matchLabels:
       alm-owner-couchbase: couchbaseoperator
