@@ -317,11 +317,12 @@ metadata:
           }
         }
       ]
+    operators.openshift.io/infrastructure-features: '["Disconnected"]'
     capabilities: "Auto Pilot"
     categories: "Database"
     certified: "true"
     containerImage: registry.connect.redhat.com/couchbase/operator:2.2.0-1
-    createdAt: 2020/08/13
+    createdAt: 2021/06/15
     description: The Couchbase Autonomous Operator allows users to easily deploy, manage, and maintain Couchbase deployments
     support: Couchbase, Inc
   name: couchbase-operator.v2.2.0-1
@@ -1129,11 +1130,14 @@ spec:
   - email: support@couchbase.com
     name: Couchbase
   maturity: stable
-  minKubeVersion: 1.13.0
+  minKubeVersion: 1.17.0
+  replaces: couchbase-operator.v2.1.0
+  skips:
+     - couchbase-operator.2.1.0-1
   provider:
     name: Couchbase
   selector:
     matchLabels:
       alm-owner-couchbase: couchbaseoperator
       operated-by: couchbaseoperator
-  version: 2.1.0-1
+  version: 2.2.0-1

@@ -489,7 +489,7 @@ spec:
                     image:
                       description: Image is the metrics image to be used to collect
                         metrics.
-                      pattern: ^[\w_\.\-/]+:([\w\d]+-)?\d+\.\d+.\d+(-[\w\d]+)?$
+                      pattern: ^(.*?(:\d+)?/)?.*?/.*?(:.*?\d+\.\d+\.\d+.*|@sha256:[0-9a-f]{64})$
                       type: string
                     resources:
                       description: Resources is the resource requirements for the
